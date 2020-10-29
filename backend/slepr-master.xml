@@ -71,5 +71,58 @@
 				<dvbisd:URI>https://raw.githubusercontent.com/DVBproject/DVB-I-Reference-Client/master/backend/servicelists/drm.xml</dvbisd:URI>
 			</sld:ServiceListURI>
 		</sld:ServiceListOffering>
+		<sld:ServiceListOffering regulatorListFlag="false">
+			<sld:ServiceListName>DVB-DASH Reference Streams</sld:ServiceListName>
+			<sld:ServiceListURI contentType="application/xml">
+				<dvbisd:URI>https://raw.githubusercontent.com/DVBproject/DVB-I-Reference-Client/master/backend/servicelists/TM-STREAM0075r1 DVB-DASH_Reference_Streams.xml</dvbisd:URI>
+			</sld:ServiceListURI>
+		</sld:ServiceListOffering>
 	</sld:ProviderOffering>
+	<!-- Start rbb-online Test-->
+	<sld:ProviderOffering>
+		<sld:Provider>
+			<sld:Name>rbb</sld:Name>
+			<sld:Address>
+				<mpeg7:Name>rbb online</mpeg7:Name>
+				<mpeg7:PostalAddress>
+					<mpeg7:AddressLine>Potsdam, Germany</mpeg7:AddressLine>
+				</mpeg7:PostalAddress>
+			</sld:Address>
+			<sld:ElectronicAddress>
+				<mpeg7:Telephone>+49 00 0000000</mpeg7:Telephone>
+				<mpeg7:Email>dvbitest@rrb-online.de</mpeg7:Email>
+			</sld:ElectronicAddress>
+		</sld:Provider>
+		<sld:ServiceListOffering regulatorListFlag="false">
+			<sld:ServiceListName>rbb Reference Client service list</sld:ServiceListName>
+			<sld:ServiceListURI contentType="application/xml">
+				<dvbisd:URI>http://research.rbb-online.de/dvbi/isims/services.php</dvbisd:URI>
+			</sld:ServiceListURI>
+		</sld:ServiceListOffering>
+	</sld:ProviderOffering>
+	<!--End rbb-online Test-->
+	<!--Start local 5G Broadcast Interface-->
+	<sld:ProviderOffering>
+		<sld:Provider>
+			<sld:Name>Local Interface</sld:Name>
+			<sld:Address>
+				<mpeg7:Name>IfN 5G Broadcast</mpeg7:Name>
+				<mpeg7:PostalAddress>
+					<mpeg7:AddressLine>Braunschweig, Germany</mpeg7:AddressLine>
+				</mpeg7:PostalAddress>
+			</sld:Address>
+			<sld:ElectronicAddress>
+				<mpeg7:Telephone>+49 351 3912403</mpeg7:Telephone>
+				<mpeg7:Email>hoyer@ifn.ing.tu-bs.de</mpeg7:Email>
+			</sld:ElectronicAddress>
+		</sld:Provider>
+		<sld:ServiceListOffering regulatorListFlag="false">
+			<sld:ServiceListName>IfN 5G Broadcast service list</sld:ServiceListName>
+			<sld:ServiceListURI contentType="application/xml">
+				<dvbisd:URI>http://</dvbisd:URI>
+				<!--<dvbisd:URI>http://link-to-my-service-list.php</dvbisd:URI>-->
+			</sld:ServiceListURI>
+		</sld:ServiceListOffering>
+	</sld:ProviderOffering>
+	<!--End local 5G Broadcast Interface-->
 </sld:ServiceListEntryPoints>

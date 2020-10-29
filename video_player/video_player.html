@@ -2,12 +2,32 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>Video player</title>
   </head>
   <body>
-    <video width="1080" controls>
-      <source src="rtp://@239.255.0.1:5004/stream.mp4" type="video/mp4">
-      Your browser does not support HTML video.
-    </video>
+    <h1>5G NR player!</h1>
+    <div>
+      <h3>No converted ogg-file</h3>
+      <video controls width="720">
+        <source src="http://localhost:10000/stream.ogg" type="video/ogg">
+        <!--<source src="http://localhost:10000/stream.mp4" type="video/mp4">-->
+        Your browser does not support HTML video.
+      </video>
+    </div>
+    <div>
+      <h3>Converting to ogg</h3>
+      <video controls width="720">
+        <source src="http://localhost:10001/stream.ogg" type="video/ogg">
+        <!--<source src="http://localhost:10000/stream.mp4" type="video/mp4">-->
+        Your browser does not support HTML video.
+      </video>
+     </div>
+<!--<div>
+      <audio controls>
+        <source src="http://localhost:10000/stream.ogg" type="audio/ogg">
+        <source src="http://localhost:10000/stream.mp4" type="audio/mp3">
+        Your browser does not support HTML video.
+      </audio>
+    </div>-->
   </body>
 </html>

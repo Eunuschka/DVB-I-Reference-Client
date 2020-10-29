@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="" />
+    <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/slepr-master.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/slepr-master.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/player.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/dvbi-common.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dvbi-common.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/video_player/video_player.html" beforeDir="false" afterPath="$PROJECT_DIR$/video_player/video_player.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,9 +24,13 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected="JavaScript Debug.player.html">
+    <configuration name="index.html (1)" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/backend/index.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/frontend/android/index.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -30,6 +40,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="JavaScript Debug.player.html" />
+        <item itemvalue="JavaScript Debug.index.html (1)" />
         <item itemvalue="JavaScript Debug.index.html" />
       </list>
     </recent_temporary>
@@ -45,10 +56,63 @@
       <workItem from="1603441781986" duration="1204000" />
       <workItem from="1603454271391" duration="7863000" />
       <workItem from="1603705197716" duration="1361000" />
+      <workItem from="1603963253240" duration="8801000" />
+      <workItem from="1603979907528" duration="2099000" />
+      <workItem from="1603985095866" duration="1802000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1603978566615">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566615" />
+    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="282" key="GridCell.Tab.1.bottom" timestamp="1603978566617">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566617" />
+    <state width="1899" height="282" key="GridCell.Tab.1.center" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="282" key="GridCell.Tab.1.left" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="282" key="GridCell.Tab.1.right" timestamp="1603978566616">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566616" />
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom" timestamp="1603978566608">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566608" />
+    <state width="1899" height="348" key="GridCell.Tab.2.center" timestamp="1603978566608">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.center/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566608" />
+    <state width="1899" height="348" key="GridCell.Tab.2.left" timestamp="1603978566608">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.left/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566608" />
+    <state width="1899" height="348" key="GridCell.Tab.2.right" timestamp="1603978566608">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="348" key="GridCell.Tab.2.right/0.0.1920.1040/1920.0.1920.1040/-1680.19.1680.1010@0.0.1920.1040" timestamp="1603978566608" />
   </component>
 </project>
