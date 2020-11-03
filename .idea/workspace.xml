@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/slepr-master.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/slepr-master.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/android/player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/player.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/dvbi-common.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/dvbi-common.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/video_player/video_player.html" beforeDir="false" afterPath="$PROJECT_DIR$/video_player/video_player.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,9 +35,13 @@
     <configuration name="player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/frontend/android/player.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
+    <configuration name="video_player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/video_player/video_player.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="JavaScript Debug.player.html" />
+        <item itemvalue="JavaScript Debug.video_player.html" />
         <item itemvalue="JavaScript Debug.index.html (1)" />
         <item itemvalue="JavaScript Debug.index.html" />
       </list>
@@ -58,7 +60,7 @@
       <workItem from="1603705197716" duration="1361000" />
       <workItem from="1603963253240" duration="8801000" />
       <workItem from="1603979907528" duration="2099000" />
-      <workItem from="1603985095866" duration="1802000" />
+      <workItem from="1603985095866" duration="12061000" />
     </task>
     <servers />
   </component>
