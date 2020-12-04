@@ -96,13 +96,14 @@
 		<sld:ServiceListOffering regulatorListFlag="false">
 			<sld:ServiceListName>rbb Reference Client service list</sld:ServiceListName>
 			<sld:ServiceListURI contentType="application/xml">
-				<dvbisd:URI>http://research.rbb-online.de/dvbi/isims/services.php</dvbisd:URI>
+				<!--<dvbisd:URI>http://research.rbb-online.de/dvbi/isims/services.php</dvbisd:URI>-->
+				<dvbisd:URI>http://localhost/servicelists/rbb.xml</dvbisd:URI>
 			</sld:ServiceListURI>
 		</sld:ServiceListOffering>
 	</sld:ProviderOffering>
 	<!--End rbb-online Test-->
 	<!--Start local 5G Broadcast Interface-->
-	<sld:ProviderOffering>
+	<!--<sld:ProviderOffering>
 		<sld:Provider>
 			<sld:Name>Local Interface</sld:Name>
 			<sld:Address>
@@ -120,9 +121,9 @@
 			<sld:ServiceListName>IfN 5G Broadcast service list</sld:ServiceListName>
 			<sld:ServiceListURI contentType="application/xml">
 				<dvbisd:URI>http://</dvbisd:URI>
-				<!--<dvbisd:URI>http://link-to-my-service-list.php</dvbisd:URI>-->
+				&lt;!&ndash;<dvbisd:URI>http://link-to-my-service-list.php</dvbisd:URI>&ndash;&gt;
 			</sld:ServiceListURI>
 		</sld:ServiceListOffering>
-	</sld:ProviderOffering>
+	</sld:ProviderOffering>-->
 	<!--End local 5G Broadcast Interface-->
 </sld:ServiceListEntryPoints>

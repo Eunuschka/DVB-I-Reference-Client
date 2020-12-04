@@ -258,6 +258,12 @@ function listSelected(list) {
 
 function populate() {
     var listElement = document.getElementById("channel_list");
+
+    /* my log */
+    let string = 'The channel list is ' + String(channels.length) + ' long.';
+    console.log(string);
+    /*  */
+
     for(var i = 0;i < channels.length;i++) {
         var channel = channels[i];
         listElement.appendChild(channel.element);
