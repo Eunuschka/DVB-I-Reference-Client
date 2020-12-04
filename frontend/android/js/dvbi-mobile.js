@@ -13,6 +13,7 @@ var parentalEnabled = false;
 var parentalPin = null;
 var pinSuccessCallback = null;
 var pinFailureCallback = null;
+var serviceList = null;
 
 //TODO use MSE-EME to determine actual DRM support, although 
 //support also depends on the audio and video codecs.
@@ -106,8 +107,7 @@ window.onload = function(){
         document.getElementById("audio_language").value = language_settings.audio_language;
         document.getElementById("subtitle_language").value = language_settings.subtitle_language;
         document.getElementById("ui_language").value = language_settings.ui_language;
-        player.setTextDefaultLanguage(language_settings.subtitle_language);
-        
+        document.getElementById("accessible_audio").checked = language_settings.accessible_audio;
         if(!i18n.loadLanguage(language_settings.ui_language,updateUILanguage)) {
             i18n.loadLanguage(DEFAULT_LANGUAGE,updateUILanguage);
         }
@@ -115,6 +115,26 @@ window.onload = function(){
     else {
        i18n.loadLanguage(DEFAULT_LANGUAGE,updateUILanguage);
     }
+    video.addEventListener('loadedmetadata', function(){
+        if(language_settings.audio_language) {
+          var audio = player.getTracksFor("audio");
+          for(var i = 0;i < audio.length;i++) {
+            if(audio[i].language == language_settings.audio_language) {
+              player.setCurrentTrack(audio[i]);
+              break;
+            }
+          }
+         }
+         if(language_settings.subtitle_language) {
+          var subtitles = player.getTracksFor("fragmentedText");
+          for(var i = 0;i < subtitles.length;i++) {
+            if(subtitles[i].language == language_settings.subtitle_language) {
+              player.setTextTrack(subtitles[i]);
+              break;
+            }
+          }
+         }
+    });
     var languages = i18n.getSupportedLanguages();
     var select = document.getElementById("ui_language");
     for (var i = 0; i < languages.length ;i++) {
@@ -183,25 +203,102 @@ function openProgramInfo(program) {
 
 function loadServicelist(list) {
     $.get( list, function( data ) {
-        var servicelist = parseServiceList(data,null,supportedDrmSystems);
-        if(servicelist.image) {
-          $("#list_logo").attr("src",servicelist.image);
+        serviceList = parseServiceList(data,null,supportedDrmSystems);
+        if(serviceList.regions) {
+           selectRegion();
         }
         else {
-          $("#list_logo").attr("src", "images/logo_dvbi_sofia.png");
+          serviceListSelected();
         }
-        var channelIndex = 0;
-        for (var i = 0; i < servicelist.services.length ;i++) {
-            var channel = new Channel(servicelist.services[i],channelIndex++);
-            channels.push(channel);
-        }
-        channels.sort(compareLCN);
-        populate();
-        epg = new EPG(channels);
     },"text");
 }
 
+function serviceListSelected() {
+  $("#servicelist_registry").hide();
+  $("#settings").hide();
+  if(serviceList.image) {
+    $("#list_logo").attr("src",serviceList.image);
+  }
+  else {
+    $("#list_logo").attr("src", "images/logo_dvbi_sofia.png");
+  }
+  var channelIndex = 0;
+  for (var i = 0; i < serviceList.services.length ;i++) {
+      var channel = new Channel(serviceList.services[i],channelIndex++);
+      channels.push(channel);
+  }
+  channels.sort(compareLCN);
+  populate();
+  epg = new EPG(channels);
+}
+
+function selectRegion() {
+  var region = getLocalStorage("region");
+  if(region) {
+    selectServiceListRegion(serviceList,region);
+    serviceListSelected();
+    return;
+  }
+  $("#settings").show();
+  showSettings("region_selection");
+  var listElement = document.getElementById("regions");
+  $(listElement).empty();
+  var provider = document.createElement('h2');
+  provider.appendChild(document.createTextNode("Select region"));
+  listElement.appendChild(provider);
+  for (var i = 0; i < serviceList.regions.length ;i++) {
+    var container = document.createElement('div');
+    var provider = document.createElement('a');
+    provider.appendChild(document.createTextNode(serviceList.regions[i]["regionName"]));
+    provider.href="javascript:regionSelected('"+serviceList.regions[i]["regionID"]+"')";
+    container.appendChild(provider);
+    listElement.appendChild(container);
+  }
+}
+
+function filterRegions() {
+    var listElement = document.getElementById("regions");
+    $(listElement).empty();
+    var provider = document.createElement('h2');
+    provider.appendChild(document.createTextNode("Select region"));
+    listElement.appendChild(provider);
+    var postCode =  $("#postcode").val();
+    if(!postCode) {
+      for (var i = 0; i < serviceList.regions.length ;i++) {
+        var container = document.createElement('div');
+        var provider = document.createElement('a');
+        provider.appendChild(document.createTextNode(serviceList.regions[i]["regionName"]));
+        provider.href="javascript:regionSelected('"+serviceList.regions[i]["regionID"]+"')";
+        container.appendChild(provider);
+        listElement.appendChild(container);
+      }
+    }
+    else {
+      var region = findRegionFromPostCode(serviceList,postCode);
+      if(region) {
+        var container = document.createElement('div');
+        var provider = document.createElement('a');
+        provider.appendChild(document.createTextNode(region["regionName"]));
+        provider.href="javascript:regionSelected('"+region["regionID"]+"')";
+        container.appendChild(provider);
+        listElement.appendChild(container);
+      }
+      else {
+         var provider = document.createElement('h3');
+        provider.appendChild(document.createTextNode("No region found!"));
+        listElement.appendChild(provider);
+      }
+    }
+}
+
+function regionSelected(regionId) {
+  setLocalStorage("region",regionId);
+  selectServiceListRegion(serviceList,regionId);
+  serviceListSelected();
+}
+
 function selectServiceList() {
+    getLocalStorage("region",true); //clear region selection
     showSettings("servicelist_registry");
     loadServicelistProviders(PROVIDER_LIST);
 }
@@ -479,11 +576,11 @@ function updateLanguage() {
     var subtitleLanguage = document.getElementById("subtitle_language").value;
     var audioLanguage = document.getElementById("audio_language").value;
     var uiLanguage = document.getElementById("ui_language").value;
+    var accessibleAudio = document.getElementById("accessible_audio").checked;
     if(uiLanguage != i18n.getCurrentLanguage()) {
        i18n.loadLanguage(uiLanguage, updateUILanguage);
     }
-    setLocalStorage("language_settings", { "subtitle_language":subtitleLanguage,"audio_language":audioLanguage,"ui_language":uiLanguage});
-    player.setTextDefaultLanguage(subtitleLanguage);    
+    setLocalStorage("language_settings", { "subtitle_language":subtitleLanguage,"audio_language":audioLanguage,"ui_language":uiLanguage,"accessible_audio":accessibleAudio});
 }
 
 function updateUILanguage() {

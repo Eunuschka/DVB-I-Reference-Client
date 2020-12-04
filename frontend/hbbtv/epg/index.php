@@ -33,9 +33,7 @@
     var VISIBLE_ROWS = 5;
     var IDLE_TIME_THRESHOLD = 600000; // 10 minutes
     var TWENTY_FOUR_HOURS = 86400000;
-	var curTime, diffTime, prevs, prevm;
-	var refTime = <?php echo round(microtime(true)*1000); ?>;
-    var tz = <?php echo date('Z')*1000; ?>; 
+    var curTime, diffTime, prevs, prevm;
     var animating = false;
     var containerFrame = null;
     var container = null;
@@ -110,8 +108,11 @@
       
         $.get( serviceList, function( data ) {
             var vid = document.getElementById('broadcast');
-            var config = vid.getChannelConfig();
-            var dvbChannels = config.channelList;
+            var dvbChannels = null;
+            try {
+              var config = vid.getChannelConfig();
+              dvbChannels = config.channelList;
+            } catch (e) {}
             var list = parseServiceList(data,dvbChannels);
             if(list.image) {
               $("#list_logo").attr("src",list.image);
@@ -180,17 +181,12 @@
 	}
 
 	function initClock() {
-        var tempTime = new Date(); 
-        var timems = tempTime.getTime();
-        diffTime = refTime-timems+tempTime.getTimezoneOffset()*60000+tz;
-        curTime = new Date(timems+diffTime);
+        curTime = new Date();
         refresh();
     }
 
     function refresh() {
-        var tempTime = new Date();
-        var timems = tempTime.getTime();
-        curTime = new Date(timems+diffTime);  
+        curTime = new Date();
         if( curTime.getMinutes() != prevm){
             displayTime();
             prevm = curTime.getMinutes();

@@ -30,6 +30,8 @@ var broadcast = null;
 var playingDASH = false;
 var playing = false;
 var serviceApp = null;
+var serviceInstance = null;
+var availablityTimer = null;
 
 if (typeof(KeyEvent)!='undefined') {
 	if (typeof(KeyEvent.VK_LEFT)!='undefined') {
@@ -143,20 +145,37 @@ function registerKeys() {
              
             var keys = [KeyEvent.VK_GUIDE,KeyEvent.VK_CHANNEL_UP,KeyEvent.VK_CHANNEL_DOWN,KeyEvent.VK_SUBTITLE,KeyEvent.VK_INFO,KeyEvent.VK_MENU];
             app.privateData.keyset.setValue(mask,keys);
+            app.opAppRequestForeground();
         } catch (e) {
             //Not an OpApp, register color buttons for HbbTV usage
             mask = 0x1+0x2+0x4+0x8+0x10+0x20+0x40+0x80+0x100;
             app.privateData.keyset.setValue(mask);
             broadcast.bindToCurrentChannel();
         }
-       
-        
 	} catch (e2) {
  	}
 }
 
 function onChannelChangeSucceeded(channel) {
-    //showInfo("onChannelChangeSucceeded:"+channel.name);
+    console.log("onChannelChangeSucceeded:"+channel.name);
+    if(languages.subtitleLanguage ) {
+      var subtitles = getDVBTracks(broadcast.COMPONENT_TYPE_SUBTITLE);
+      for(var i = 0;i < subtitles.length;i++) { 
+          if(subtitles[i].lang == languages.subtitleLanguage) {
+            selectDVBTrack(checked, supervisor.COMPONENT_TYPE_SUBTITLE);
+            break;
+          }
+      }
+    }
+    if(languages.audioLanguage ) {
+       var audioTracks = getDVBTracks(broadcast.COMPONENT_TYPE_AUDIO);
+       for(var i = 0;i < audioTracks.length;i++) { 
+          if(audioTracks[i].lang == languages.audioLanguage) {
+            selectDVBTrack(checked, supervisor.COMPONENT_TYPE_AUDIO);
+            break;
+          }
+      }
+    }
 }
 function onChannelChangeError(channel,error) {
     //showInfo("onChannelChangeError:"+channel.name+ " Error:"+error);
@@ -384,7 +403,8 @@ function onKey(keyCode)
             }
 
 		break;
-        case VK_YELLOW:
+    case VK_YELLOW:
+    case KeyEvent.VK_SUBTITLE:
             showSettings();
             break;
 		case VK_PAUSE:
@@ -684,7 +704,7 @@ function showInfobanner() {
       }
       updateBannerProgram("chinfo_next_",channel.epg.next); 
     }
-    else if(supervisor && supervisor.currentChannel && serviceInstance.dvbChannel && supervisor.currentChannel.ccid == serviceInstance.dvbChannel.ccid){
+    else if(supervisor && serviceInstance && supervisor.currentChannel && serviceInstance.dvbChannel && supervisor.currentChannel.ccid == serviceInstance.dvbChannel.ccid){
         var programs = supervisor.programmes;
         if(programs.length > 0) {
             updateBannerProgramDVB("chinfo_now_",programs[0]);
@@ -873,29 +893,79 @@ function selectService(channel_obj) {
      doServiceSelection();
 }
 
+function checkAvailability() {
+   console.log("checkAvailability",new Date());
+   var instance = selectedService.getServiceInstance();
+   if(instance != serviceInstance) {
+       console.log("different service instace, select service");
+      doServiceSelection();
+   }
+   availablityTimer = setTimeout(checkAvailability,60*1000);
+}
+
 function doServiceSelection() {
   try{
       playing= true;
       $("#info").addClass("hide");
-      if(selectedService.mediaPresentationApps) {
-          for(var i = 0;i< selectedService.mediaPresentationApps.length;i++ ) {
-            if(selectedService.mediaPresentationApps[i].contentType == "application/vnd.dvb.ait+xm") {
-              serviceApp = _application_.createApplication(selectedService.mediaPresentationApps[i].url);
+      serviceInstance = selectedService.getServiceInstance();
+      if(availablityTimer) {
+        clearInterval(availablityTimer);
+      }
+      if(selectedService.hasAvailability()) {
+        availablityTimer = setTimeout(checkAvailability,(60-new Date().getSeconds())*1000);
+      }
+
+      if(serviceInstance == null) {
+        if(player) {
+            player.stop();
+            player = null;
+        }
+        else {
+              try {
+              broadcast = document.getElementById('broadcast');
+              broadcast.stop();
+              broadcast.addClass("hide_broadcast");
+              }
+              catch(e) {}
+          }
+        showInfo("Service not available");
+        return;
+      }
+      if(serviceInstance.mediaPresentationApps) {
+          for(var i = 0;i< serviceInstance.mediaPresentationApps.length;i++ ) {
+            if(serviceInstance.mediaPresentationApps[i].contentType == "application/vnd.dvb.ait+xml") {
+              serviceApp = _application_.createApplication(serviceInstance.mediaPresentationApps[i].url,true);
               return;
             }
           }
       }
-      var serviceInstance = selectedService.getServiceInstance();
+      if(selectedService.mediaPresentationApps) {
+          for(var i = 0;i< selectedService.mediaPresentationApps.length;i++ ) {
+            if(selectedService.mediaPresentationApps[i].contentType == "application/vnd.dvb.ait+xml") {
+              serviceApp = _application_.createApplication(selectedService.mediaPresentationApps[i].url,true);
+              return;
+            }
+          }
+      }
       if(serviceInstance.dvbChannel) {
           selectDVBService(serviceInstance.dvbChannel) ;
       }
       else if(serviceInstance.dashUrl) {
           playDASH(serviceInstance.dashUrl);
       }
-      if(selectedService.parallelApp) {
+      if(serviceInstance.parallelApps) {
+        for(var i = 0;i< serviceInstance.parallelApps.length;i++ ) {
+          if(serviceInstance.parallelApps[i].contentType == "application/vnd.dvb.ait+xml") {
+            serviceApp = _application_.createApplication(serviceInstance.parallelApps[i].url,true);
+            return;
+          }
+        }
+      }
+      if(selectedService.parallelApps) {
         for(var i = 0;i< selectedService.parallelApps.length;i++ ) {
-          if(selectedService.parallelApps[i].contentType == "application/vnd.dvb.ait+xm") {
-            serviceApp = _application_.createApplication(selectedService.parallelApps[i].url);
+          if(selectedService.parallelApps[i].contentType == "application/vnd.dvb.ait+xml") {
+            serviceApp = _application_.createApplication(selectedService.parallelApps[i].url,true);
+            return;
           }
         }
       }

@@ -7,51 +7,128 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     serviceList.services = list;
     var parser = new DOMParser();
     var doc = parser.parseFromString(data,"text/xml");
-    var services = doc.getElementsByTagName("Service");
-    var contentGuides = doc.getElementsByTagName("ContentGuideSource");
+    var ns = doc.documentElement.namespaceURI;
+    var howRelatedNamespace = "urn:tva:metadata:2019";
+    var howRelatedHref = "urn:dvb:metadata:cs:HowRelatedCS:2019:";
+    if(ns == "urn:dvb:metadata:servicediscovery:2020") {
+      howRelatedNamespace = "urn:dvb:metadata:servicediscovery:2020";
+      howRelatedHref = "urn:dvb:metadata:cs:HowRelatedCS:2020:";
+    }
+    var services = getChildElements(doc.documentElement,"Service");
+    var contentGuides = getChildElements(doc.documentElement,"ContentGuideSource");
     var contentGuideURI = null;
-
+    var channelmap = [];
+    if(dvbChannels) {
+      for(var i = 0;i<dvbChannels.length;i++) {
+          var dvbChannel = dvbChannels.item(i);
+          var triplet = dvbChannel.onid +"."+dvbChannel.tsid+"."+dvbChannel.sid;
+          channelmap[triplet] = dvbChannel;
+      }
+    }
     if(contentGuides.length > 0) {
         contentGuideURI = contentGuides[0].getElementsByTagName("ScheduleInfoEndpoint")[0].getElementsByTagName("URI")[0].childNodes[0].nodeValue;
     }
-    var relatedMaterial = doc.getElementsByTagName("RelatedMaterial");
+    var relatedMaterial = getChildElements(doc.documentElement,"RelatedMaterial");
     for(var j = 0;j < relatedMaterial.length;j++) {
-        var howRelated = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","HowRelated")[0].getAttribute("href");
-        if(howRelated == "urn:dvb:metadata:cs:HowRelatedCS:2019:1001.1") {
-            serviceList.image = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
+        var howRelated = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"HowRelated")[0].getAttribute("href");
+        if(howRelated == howRelatedHref+"1001.1") {
+            serviceList.image = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
         }
     }
+    var regionList = getChildElements(doc.documentElement,"RegionList");
+    if(regionList.length > 0) {
+       serviceList.regions = [];
+       var regions =  getChildElements(regionList[0],"Region");
+       for (var i = 0; i < regions.length ;i++) {
+          var regionElement = regions[i];
+          serviceList.regions.push(parseRegion(regionElement));
+          var primaryRegions =  getChildElements(regionElement,"Region");
+          for (var j = 0; j < primaryRegions.length ;j++) {
+            var regionElement = primaryRegions[j];
+            serviceList.regions.push(parseRegion(regionElement));
+            var secondaryRegions =  getChildElements(regionElement,"Region");
+            for (var k = 0; k < secondaryRegions.length ;k++) {
+              var regionElement = secondaryRegions[k];
+              serviceList.regions.push(parseRegion(regionElement));
+              var tertiaryRegions =  getChildElements(regionElement,"Region");
+              for (var l = 0; l < tertiaryRegions.length ;l++) {
+                var regionElement = tertiaryRegions[l];
+                serviceList.regions.push(parseRegion(regionElement));
+              }
+            }
+          }
+       }
+    }
+
     var maxLcn = 0;
-    var lcnList = doc.getElementsByTagName("LCNTable")[0].getElementsByTagName("LCN");
+    var lcnTables = doc.getElementsByTagName("LCNTable");
+    var lcnList = lcnTables[0].getElementsByTagName("LCN");
+    serviceList.lcnTables = [];
+    for (var i = 0; i < lcnTables.length ;i++) {
+      var lcnTable = {};
+      lcnTable.lcn = [];
+      var targetRegions =  lcnTables[i].getElementsByTagName("TargetRegion");
+      if(targetRegions.length > 0) {
+        lcnTable.targetRegions = [];
+        for(var j = 0;j < targetRegions.length;j++) {
+           lcnTable.targetRegions.push(targetRegions[j].childNodes[0].nodeValue);
+        }
+      }
+      var lcnList = lcnTables[i].getElementsByTagName("LCN");
+      for(var j = 0; j < lcnList.length ;j++) {
+            var lcn = {};
+            lcn.serviceRef = lcnList[j].getAttribute("serviceRef");
+            lcn.channelNumber = parseInt(lcnList[j].getAttribute("channelNumber"));
+            lcnTable.lcn.push(lcn);
+      }
+      serviceList.lcnTables.push(lcnTable);
+    }
     for (var i = 0; i < services.length ;i++) {
         var chan = {};
         chan.contentGuideURI = contentGuideURI;
         chan.code = i;
         chan.title = services[i].getElementsByTagName("ServiceName")[0].childNodes[0].nodeValue;
         chan.id = services[i].getElementsByTagName("UniqueIdentifier")[0].childNodes[0].nodeValue;
+        var providers = services[i].getElementsByTagName("ProviderName");
+        if(providers.length > 0) {
+          chan.provider = providers[0].childNodes[0].nodeValue;
+        }
+        var targetRegions = services[i].getElementsByTagName("TargetRegion");
+        if(targetRegions.length > 0) {
+          chan.targetRegions = [];
+          for(var j = 0;j < targetRegions.length;j++) {
+             chan.targetRegions.push(targetRegions[j].childNodes[0].nodeValue);
+          }
+        }
         chan.parallelApps = [];
         chan.mediaPresentationApps = [];
         var cgRefs =  services[i].getElementsByTagName("ContentGuideServiceRef");
         if(cgRefs && cgRefs.length > 0) {
             chan.contentGuideServiceRef = cgRefs[0].childNodes[0].nodeValue;
         }
-        var relatedMaterial = services[i].getElementsByTagName("RelatedMaterial");
+        var relatedMaterial = getChildElements(services[i],"RelatedMaterial");
         for(var j = 0;j < relatedMaterial.length;j++) {
-            var howRelated = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","HowRelated")[0].getAttribute("href");
-            if(howRelated == "urn:dvb:metadata:cs:HowRelatedCS:2019:1001.2") {
-                chan.image = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
+            var howRelated = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"HowRelated")[0].getAttribute("href");
+            if(howRelated == howRelatedHref+"1001.2") {
+                chan.image = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
             }
             else if(howRelated == "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1") {
                 var app = {};
-                app.url = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
-                app.contentType = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].getAttribute("contentType");
-                chan.parallelApps.push(app);
+                var mediaUri =  relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0];
+                if(mediaUri  && mediaUri.childNodes.length > 0) {
+                  app.url = mediaUri.childNodes[0].nodeValue;
+                  app.contentType = mediaUri.getAttribute("contentType");
+                  chan.parallelApps.push(app);
+                }
             }
             else if(howRelated == "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2") {
                 var app = {};
-                app.url = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
-                app.contentType = relatedMaterial[j].getElementsByTagNameNS("urn:tva:metadata:2019","MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].getAttribute("contentType");
-                chan.mediaPresentationApps.push(app);
+                var mediaUri =  relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0];
+                if(mediaUri && mediaUri.childNodes.length > 0) {
+                  app.url = mediaUri.childNodes[0].nodeValue;
+                  app.contentType = mediaUri.getAttribute("contentType");
+                  chan.mediaPresentationApps.push(app);
+                }
             }
         }
         var serviceInstances = services[i].getElementsByTagName("ServiceInstance");
@@ -62,7 +139,9 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
             var instance = {};
             instance.priority = priority;
             instance.contentProtection = [];
-            var contentProtectionElements =  serviceInstances[j].getElementsByTagName("ContentProtection");
+            instance.parallelApps = [];
+            instance.mediaPresentationApps = [];
+            var contentProtectionElements =  getChildElements(serviceInstances[j],"ContentProtection");
             var drmSupported = true;
             for(var k = 0;k < contentProtectionElements.length;k++) {
               for(var l = 0;l < contentProtectionElements[k].childNodes.length;l++) {
@@ -75,11 +154,11 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
                 }
               }
             }
-            if(instance.contentProtection.length > 0) {
+            if(supportedDrmSystems && instance.contentProtection.length > 0) {
               var supported = false;
               for(var k = 0;k < instance.contentProtection.length;k++) {
                  for(var l = 0;l < supportedDrmSystems.length;l++) {
-                    if(instance.contentProtection[k].drmSystemId == supportedDrmSystems[l]) {
+                    if(instance.contentProtection[k].drmSystemId.toLowerCase() == (supportedDrmSystems[l].toLowerCase())) {
                       supported = true;
                       break;
                     }
@@ -92,6 +171,51 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
                 continue;
               }
             }
+            var availability = getChildElements(serviceInstances[j],"Availability");
+            instance.availability = null;
+            if(availability.length > 0 ) {
+              instance.availability = [];
+              //Only 1 availability-element allowed
+              var periods = getChildElements(availability[0],"Period");
+              for(var k = 0;k < periods.length;k++) {
+                var period ={};
+                period.validFrom = periods[k].getAttribute("validFrom");
+                period.validTo = periods[k].getAttribute("validTo");
+                period.intervals = [];
+                var intervals = getChildElements(periods[k],"Interval");
+                for(var l = 0;l < intervals.length;l++) {
+                  var interval = {};
+                  interval.days = intervals[l].getAttribute("days");
+                  interval.recurrence = intervals[l].getAttribute("recurrence");
+                  interval.startTime = intervals[l].getAttribute("startTime");
+                  interval.endTime = intervals[l].getAttribute("endTime");
+                  period.intervals.push(interval);
+                }
+                instance.availability.push(period);
+              }
+            }
+            var relatedMaterial = getChildElements(serviceInstances[j],"RelatedMaterial");
+            for(var k = 0;k < relatedMaterial.length;k++) {
+                var howRelated = relatedMaterial[k].getElementsByTagNameNS(howRelatedNamespace,"HowRelated")[0].getAttribute("href");
+                if(howRelated == "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1") {
+                    var app = {};
+                    var mediaUri =  relatedMaterial[k].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0];
+                    if(mediaUri && mediaUri.childNodes.length > 0) {
+                      app.url = mediaUri.childNodes[0].nodeValue;
+                      app.contentType = mediaUri.getAttribute("contentType");
+                      instance.parallelApps.push(app);
+                    }
+                }
+                else if(howRelated == "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.2") {
+                    var app = {};
+                    var mediaUri =  relatedMaterial[k].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0];
+                    if(mediaUri && mediaUri.childNodes.length > 0) {
+                      app.url = mediaUri.childNodes[0].nodeValue;
+                      app.contentType = mediaUri.getAttribute("contentType");
+                      instance.mediaPresentationApps.push(app);
+                    }
+                }
+            }
             if(serviceInstances[j].getElementsByTagName("DASHDeliveryParameters").length > 0 ) {
                    try {
                     instance.dashUrl = serviceInstances[j].getElementsByTagName("URI")[0].childNodes[0].nodeValue;
@@ -102,7 +226,8 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
             else if(dvbChannels) {
                 var triplets = serviceInstances[j].getElementsByTagName("DVBTriplet");
                 if(triplets.length > 0 ) {
-                    var dvbChannel = getDVBChannel(triplets[0],dvbChannels);
+                    var triplet = triplets[0].getAttribute("origNetId")+"."+triplets[0].getAttribute("tsId")+"."+triplets[0].getAttribute("serviceId");
+                    var dvbChannel = channelmap[triplet];
                     if(dvbChannel) {
                         if(serviceInstances[j].getElementsByTagName("DVBTDeliveryParameters").length > 0) {
                             sourceTypes.push("DVB-T");
@@ -122,8 +247,11 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
                     }
                 }
             }
+            if(instance.mediaPresentationApps.length > 0 && instances.indexOf(instance) == -1) {
+                instances.push(instance);
+            }
         }
-        if(instances.length == 0 && chan.mediaPresentationApp == null) {
+        if(instances.length == 0 && chan.mediaPresentationApps.length == 0) {
             continue;
         }
         for(var j = 0;j < lcnList.length;j++) {
@@ -148,19 +276,176 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     return serviceList;
 }
 
-function getDVBChannel(tripletElement,dvbChannels) {
-    if(!dvbChannels) {
-        return null;
+function parseRegion(regionElement) {
+  var region = {};
+  region.countryCodes = regionElement.getAttribute("countryCodes");
+  region.regionID = regionElement.getAttribute("regionID");
+  var names = getChildElements(regionElement,"RegionName");
+  if(names.length == 1) {
+    region.regionName = names[0].childNodes[0].nodeValue;
+  }
+  else if(names.length > 1) {
+    region.regionNames = [];
+    for(var j = 0;j < names.length;j++) {
+      var name = {};
+      name.name =  names[j].childNodes[0].nodeValue;
+      name.lang = names[j].getAttributeNS("xml","lang");
+      region.regionNames.push(name);
     }
-    for(var i = 0;i<dvbChannels.length;i++) {
-        var dvbChannel = dvbChannels.item(i);
-        if(dvbChannel.sid == tripletElement.getAttribute("serviceId") &&
-            dvbChannel.onid == tripletElement.getAttribute("origNetId") &&
-            dvbChannel.tsid == tripletElement.getAttribute("tsId")) {
-            return dvbChannel;
+  }
+  var wildcardPostcodes = getChildElements(regionElement,"WildcardPostcode");
+  if(wildcardPostcodes.length > 0) {
+    region.wildcardPostcodes = [];
+    for(var j = 0;j < wildcardPostcodes.length;j++) {
+      region.wildcardPostcodes.push(wildcardPostcodes[j].childNodes[0].nodeValue);
+    }
+  }
+  var postcodes = getChildElements(regionElement,"Postcode");
+  if(postcodes.length > 0) {
+    region.postcodes = [];
+    for(var j = 0;j < postcodes.length;j++) {
+      region.postcodes.push(postcodes[j].childNodes[0].nodeValue);
+    }
+  }
+  var postcodeRanges = getChildElements(regionElement,"PostcodeRange");
+  if(postcodeRanges.length > 0) {
+    region.postcodeRanges = [];
+    for(var j = 0;j < postcodeRanges.length;j++) {
+      var range = {};
+      range.from = postcodeRanges[j].getAttribute("from");
+      range.to = postcodeRanges[j].getAttribute("to");
+      region.postcodeRanges.push(range);
+    }
+  }
+  var coordinates = getChildElements(regionElement,"Coordinates");
+  if(coordinates.length > 0) {
+    region.coordinates = [];
+    for(var j = 0;j < coordinates.length;j++) {
+      var coordinate = {};
+      coordinate.latitude = getChildElements(coordinates[j],"Latitude")[0].childNodes[0].nodeValue;
+      coordinate.longitude = getChildElements(coordinates[j],"Longitude")[0].childNodes[0].nodeValue;
+      coordinate.radius = getChildElements(coordinates[j],"Radius")[0].childNodes[0].nodeValue;
+      region.coordinates.push(coordinate);
+    }
+  }
+  return region;
+}
+
+function findRegionFromPostCode(serviceList,postCode) {
+  for (var i = 0; i < serviceList.regions.length ;i++) {
+    var region = serviceList.regions[i];
+    if(region.postcodes) {
+      for (var j = 0; j < region.postcodes.length ;j++) { 
+        if(region.postcodes[j] == postCode) {
+          return region;
         }
+      }
     }
-    return null;
+    if(region.postcodeRanges) {
+      for (var j = 0; j < region.postcodeRanges.length ;j++) { 
+        if(matchPostcodeRange(region.postcodeRanges[j],postCode)) {
+          return region;
+        }
+      }
+    }
+    if(region.wildcardPostcodes) {
+      for (var j = 0; j < region.wildcardPostcodes.length ;j++) { 
+        if(matchPostcodeWildcard(region.wildcardPostcodes[j],postCode)) {
+          return region;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function matchPostcodeRange(range,postCode) {
+    if(range.from > postCode || range.to < postCode) {
+      return false;
+    }
+    return true;
+}
+
+function matchPostcodeWildcard(wildcard,postCode) {
+    var wildcardIndex = wildcard.indexOf("*");
+    if(wildcardIndex == wildcard.length-1) {
+      //Wildcard is in the end, check that the postcode
+      //starts with the wildcard
+      var wildcardMatch = wildcard.substring(0,wildcard.length-1);
+      if(postCode.indexOf(wildcardMatch) == 0) {
+        return true;
+      }
+    }
+    else if (wildcardIndex == 0) {
+      var wildcardMatch = wildcard.substring(1,wildcard.length);
+      if(postCode.indexOf(wildcardMatch, postCode.length - wildcardMatch.length) !== -1) {
+        return true;
+      }
+    }
+    else if(wildcardIndex != -1) {
+      var startMatch =  wildcard.substring(0,wildcardIndex);
+      var endMatch = wildcard.substring(wildcardIndex+1,wildcard.length);
+      if(postCode.indexOf(startMatch) == 0 && postCode.indexOf(endMatch, postCode.length - endMatch.length) !== -1) {
+        return true;
+      } 
+    }
+    return false;
+}
+
+function selectServiceListRegion(serviceList,regionId) {
+  var lcnTable = null;
+  for(var i = 0;i<serviceList.lcnTables.length;i++) {
+    var table = serviceList.lcnTables[i];
+    for(var j = 0;j<table.targetRegions.length;j++) {
+      if(table.targetRegions[j] == regionId) {
+        lcnTable = table;
+        break;
+      }
+    }
+    if(lcnTable != null) {
+      break;
+    }
+  }
+  if(lcnTable == null) {
+    throw "No LCN table found";
+  }
+  var validServices = []
+  for(var i = 0;i<serviceList.services.length;i++) {
+    var service = serviceList.services[i];
+    var valid = false;
+    if(service.targetRegions) {
+      for(var j = 0;i<service.targetRegions.length;j++) {
+        if(table.targetRegions[j] == regionId) {
+          valid = true;
+          break;
+        }
+      }
+    }
+    else {
+      valid = true;
+    }
+    if(valid) {
+      for(var j = 0;j < lcnTable.lcn.length;j++) {
+          if(lcnTable.lcn[j].serviceRef == service.id) {
+              service.lcn = lcnTable.lcn[j].channelNumber;
+              break;
+          }
+      }
+      validServices.push(service);
+    }
+  }
+  serviceList.services = validServices;
+}
+
+function getChildElements(parent,tagName) {
+  var elements= [];
+  for(i = 0; i < parent.childNodes.length; i++)
+  {
+    if(parent.childNodes[i].nodeType == 1 && parent.childNodes[i].tagName == tagName) {
+      elements.push(parent.childNodes[i]);
+    }
+  }
+  return elements;
 }
 
 function generateServiceListQuery(baseurl,providers,language,genre,targetCountry,regulatorListFlag) {
@@ -256,4 +541,83 @@ getParentalRating = function(href){
     else {
         return "Unknown";
     }
+}
+
+function isServiceInstanceAvailable(instance) {
+  if(instance.availability) {
+    var now = new Date();
+    now.setMilliseconds(0);
+    for(var i = 0; i < instance.availability.length;i++) {
+      var period = instance.availability[i];
+      if(period.validFrom) {
+        if(new Date(period.validFrom) > now) {
+          continue;
+        }
+      }
+      if(period.validTo) {
+        if(new Date(period.validTo) < now) {
+          continue;
+        }
+      }
+      if(period.intervals) {
+        for(var j = 0; j < period.intervals.length;j++) {
+          var interval = period.intervals[j];
+          if(isIntervalNow(interval,now)) {
+            return true;
+          }
+        }
+      }
+      else {
+        return true;
+      }
+    }
+    return false;
+  }
+  return true;
+}
+
+function isIntervalNow(interval,now) {
+   if(interval.days) {
+    var day = now.getDay();
+    //JS days are 0..6 starting from sunday
+    //Availability days are 1..7 starting from monday
+    //So change sunday from 0 to 7
+    if(day == 0) {
+      day = 7;
+    }
+    day = day.toString();
+    if(interval.days.indexOf(day) == -1) {
+      return false;
+    }
+  }
+  if(interval.startTime) {
+    if(parseIntervalTime(interval.startTime) > now) {
+      return false;
+    }
+  }
+  if(interval.endTime) {
+    if(parseIntervalTime(interval.endTime) <= now) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function parseIntervalTime(time,day) {
+  if(time.length == 9 && time.charAt(8) == 'Z') {
+    var date = new Date();
+    var timeparts = time.substring(0,8).split(":");
+    date.setUTCHours(parseInt(timeparts[0]));
+    date.setUTCMinutes(parseInt(timeparts[1]));
+    date.setUTCSeconds(parseInt(timeparts[2]));
+    date.setMilliseconds(0);
+    return date;
+  }
+  return null;
+}
+
+var dvb_i_language_list = {
+  "eng": "English",
+  "deu" : "Deutsch",
+  "fin":"Suomi"
 }

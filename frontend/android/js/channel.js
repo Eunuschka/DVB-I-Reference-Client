@@ -83,12 +83,25 @@ Channel.prototype.init = function( init_obj, channel_index){
 
 Channel.prototype.unselected = function () {
     var self = this;
+    if(self.availablityTimer) {
+      clearInterval(self.availablityTimer);
+      self.availablityTimer = null;
+    }
     self.selected = false;
     self.element.classList.remove("active");
 }
 
-Channel.prototype.getMediaPresentationApp = function(mediaPresentationApp) {
+Channel.prototype.getMediaPresentationApp = function(serviceInstance) {
     var self = this;
+    if(serviceInstance.mediaPresentationApps) {
+      for(var i = 0; i < serviceInstance.mediaPresentationApps.length;i++) {
+        var mediaPresentationApp = serviceInstance.mediaPresentationApps[i];
+        if(mediaPresentationApp.contentType == "text/html" || 
+           mediaPresentationApp.contentType == "application/xhtml+xml") {
+            return mediaPresentationApp.url;
+        }
+      }
+    }
     if(self.mediaPresentationApps) {
       for(var i = 0; i < self.mediaPresentationApps.length;i++) {
         var mediaPresentationApp = self.mediaPresentationApps[i];
@@ -98,6 +111,17 @@ Channel.prototype.getMediaPresentationApp = function(mediaPresentationApp) {
         }
       }
     }
+    return null;
+}
+
+Channel.prototype.checkAvailability = function() {
+   console.log("checkAvailability",new Date());
+   var instance = this.getServiceInstance();
+   if(instance != this.serviceInstance) {
+       console.log("different service instace, select service");
+      this.channelSelected();
+   }
+   this.availablityTimer = setTimeout(this.checkAvailability.bind(this),60*1000);
 }
 
 Channel.prototype.channelSelected = function () {
@@ -105,15 +129,22 @@ Channel.prototype.channelSelected = function () {
     self.element.classList.add("active");
     self.selected = true;
     var update =function () {
-        var serviceInstance = self.getServiceInstance();
+        self.serviceInstance = self.getServiceInstance();
+        if(self.availablityTimer) {
+          clearInterval(self.availablityTimer);
+        }
+        if(self.hasAvailability()) {
+          self.availablityTimer = setTimeout(self.checkAvailability.bind(self),(60-new Date().getSeconds())*1000);
+        }
+
         self.setProgramChangedTimer();
         self.updateChannelInfo();
-        var mediaPresentationApp = self.getMediaPresentationApp();
+        var mediaPresentationApp = self.getMediaPresentationApp(self.serviceInstance);
         if(mediaPresentationApp) {
           window.location = mediaPresentationApp;
         }
         else if(self.isProgramAllowed()) {
-            player.attachSource(serviceInstance.dashUrl);
+            player.attachSource(self.serviceInstance.dashUrl);
         }
         else {
           player.attachSource(null);
@@ -121,12 +152,12 @@ Channel.prototype.channelSelected = function () {
             function() {
                 $("#notification").hide();
                 try {
-                    if(player.getSource() != serviceInstance.dashUrl) {
-                        player.attachSource(serviceInstance.dashUrl);
+                    if(player.getSource() != self.serviceInstance.dashUrl) {
+                        player.attachSource(self.serviceInstance.dashUrl);
                     }
                 } catch(e) {
                     //player throws an error is there is no souce attached
-                   player.attachSource(serviceInstance.dashUrl);
+                   player.attachSource(self.serviceInstance.dashUrl);
                 }
               },
               function() {               
@@ -225,6 +256,9 @@ Channel.prototype.updateChannelInfo = function () {
      var info = "";
      info = "<span class=\"menuitem_chicon d-block\"><img src=\""+(self.image || "./images/empty.png") +"\"></span>";
      info += "<span class=\"menuitem_chnumber d-inline-block\">" + self.lcn +".</span><span class=\"menuitem_chname d-inline-block\">" + self.title +"</span>";
+     if(self.provider) {
+         info += "<br/><span class=\"menuitem_provider d-inline-block\">" + self.provider +"</span>";
+     }
      if(self.now_next) {
         curTime = new Date();
         var now = self.now_next["now"];

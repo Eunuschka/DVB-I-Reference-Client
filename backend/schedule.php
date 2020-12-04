@@ -39,7 +39,7 @@ else if(isset($_GET['start']) && isset($_GET['end']) && isset($_GET['sids']) ){
     $programs = "";
     $schedules = "";
     $index = 1;
-    $id = "crid://".$sid.".".$index;
+    $id = "crid://dvbi-reference/".$sid.".".$index;
     while($start < $schedule_end) {
         $schedule = file_get_contents("schedule_event_template.xml");
         $schedule =str_replace("PROGRAM_ID_TEMPLATE",$id,$schedule);
@@ -65,6 +65,7 @@ else if(isset($_GET['start']) && isset($_GET['end']) && isset($_GET['sids']) ){
 
 function getNowNext( $sid ) {
     global $timeformat;
+    $sid = str_replace(":","_",$sid);
     if (strpos($sid, '/') !== false || strpos($sid, '..') !== false || file_exists("./schedule_templates/".$sid.".xml") === false) {
         return NULL;
     }
@@ -121,6 +122,7 @@ function getNowNext( $sid ) {
 
 function getSchdeule( $sid,$start,$end ) {
     global $timeformat;
+    $sid = str_replace(":","_",$sid);
     if (is_int($start) === false || is_int($end) === false || strpos($sid, '/') !== false || strpos($sid, '..') !== false || file_exists("./schedule_templates/".$sid.".xml") === false) {
         return NULL;
     }
