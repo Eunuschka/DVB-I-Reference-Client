@@ -10,13 +10,20 @@
     <!-- Bootstrap -->
     <link href="styles/bootstrap-4.3.1.css" rel="stylesheet">
 </head>
-<body>
+<body style="background:#000000">
     <h1>Hello World</h1>
     <p>Implement a way of putting out RTP streams here. Especially mp4 files.</p>
 
     <div id="rtp-player">
         <!-- Add your implementation here. -->
+        <video controls>
+            <source src=http://127.0.0.1:8081 type=video/mp4>
+        </video>
     </div>
+
+    <span class="menuitem_epg btn btn-outline-dark btn-small mt-1 p-1">
+        <span class="text-white settings"><a href="player.html">Back to DVB-I</a></span>
+    </span>
 
 </body>
 </html>
