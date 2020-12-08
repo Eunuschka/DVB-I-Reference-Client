@@ -105,8 +105,7 @@
 		<sld:ServiceListOffering regulatorListFlag="false">
 			<sld:ServiceListName>rbb Reference Client service list</sld:ServiceListName>
 			<sld:ServiceListURI contentType="application/xml">
-				<!--<dvbisd:URI>http://research.rbb-online.de/dvbi/isims/services.php</dvbisd:URI>-->
-				<dvbisd:URI>http://localhost/servicelists/rbb.xml</dvbisd:URI>
+				<dvbisd:URI>http://research.rbb-online.de/dvbi/isims/services.php</dvbisd:URI>
 			</sld:ServiceListURI>
 		</sld:ServiceListOffering>
 	</sld:ProviderOffering>

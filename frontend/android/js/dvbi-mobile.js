@@ -392,6 +392,13 @@ function showStreamInfo() {
   toggleSettings();
 }
 
+/******************* my function *********************/
+function open5GBroadcast() {
+    location.href = "rtp-player.html";
+    return;
+}
+/*****************************************************/
+
 function updateStreamInfo() {
     if(player) {
         try {
