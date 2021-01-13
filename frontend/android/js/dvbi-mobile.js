@@ -8,12 +8,13 @@ var minimumAge = 0;
 var programChangeTimer = null;
 var trackSelection = null;
 var i18n = null;
-var DEFAULT_LANGUAGE = "en";
+var DEFAULT_LANGUAGE = "eng";
 var parentalEnabled = false;
 var parentalPin = null;
 var pinSuccessCallback = null;
 var pinFailureCallback = null;
 var serviceList = null;
+var language_settings = null;
 
 //TODO use MSE-EME to determine actual DRM support, although 
 //support also depends on the audio and video codecs.
@@ -35,6 +36,12 @@ function channelSelected(channelId) {
     else if(!newChannel) {
         return;
     }
+    if(newChannel.serviceInstances.length == 0) {
+      $("#notification").text("Service not supprted");
+      $("#notification").show();
+      setTimeout(function() { $("#notification").hide();} , 5000);
+      return;
+    }
     closeEpg();
     if(selectedChannel) {
         selectedChannel.unselected();
@@ -43,6 +50,7 @@ function channelSelected(channelId) {
     $("#tracklist").hide();
     $("#subtitle").hide();
     $("#audio").hide();
+    $("#pause").hide();
     newChannel.channelSelected();
     selectedChannel = newChannel;
 
@@ -73,11 +81,23 @@ window.onload = function(){
        if(audio && audio.length > 1) {
           $("#audio").show();
        }
+       $("#pause a").text("Pause");
+       $("#pause").show();
     });
     
     player = dashjs.MediaPlayer().create();
     player.initialize(video);
     player.setAutoPlay(true);
+    player.on('error', function(e) {
+      console.log(e);
+      $("#notification").show();
+      if(e.error && e.error.message) {
+         $("#notification").text("Error playing stream: "+e.error.message);
+      }
+      else {
+        $("#notification").text("Error playing stream!");
+      }
+    });
     player.attachTTMLRenderingDiv( document.getElementById("subtitles"));
     var ll_settings = getLocalStorage("ll_settings");
     if(ll_settings) {
@@ -101,7 +121,7 @@ window.onload = function(){
         parentalPin = parental_settings.parentalPin;
         document.getElementById("parentalControl").value = minimumAge;
     }
-    var language_settings = getLocalStorage("language_settings");
+    language_settings = getLocalStorage("language_settings");
     i18n = new I18n();
     if(language_settings) {
         document.getElementById("audio_language").value = language_settings.audio_language;
@@ -113,27 +133,39 @@ window.onload = function(){
         }
     }
     else {
+       language_settings = {};
+       language_settings.ui_language = DEFAULT_LANGUAGE;
        i18n.loadLanguage(DEFAULT_LANGUAGE,updateUILanguage);
     }
     video.addEventListener('loadedmetadata', function(){
-        if(language_settings.audio_language) {
-          var audio = player.getTracksFor("audio");
-          for(var i = 0;i < audio.length;i++) {
-            if(audio[i].language == language_settings.audio_language) {
+      if(language_settings.audio_language) {
+        var audio = player.getTracksFor("audio");
+        var track = null;
+        for(var i = 0;i < audio.length;i++) {
+          if(audio[i].lang == language_settings.audio_language) {
+            if(language_settings.accessible_audio && audio[i].roles.includes("supplementary")) {
               player.setCurrentTrack(audio[i]);
+              track = null;
               break;
             }
-          }
-         }
-         if(language_settings.subtitle_language) {
-          var subtitles = player.getTracksFor("fragmentedText");
-          for(var i = 0;i < subtitles.length;i++) {
-            if(subtitles[i].language == language_settings.subtitle_language) {
-              player.setTextTrack(subtitles[i]);
-              break;
+            if(track == null) {
+              track = audio[i];
             }
           }
-         }
+        }
+        if(track) {
+          player.setCurrentTrack(track);
+        }
+       }
+       if(language_settings.subtitle_language) {
+        var subtitles = player.getTracksFor("fragmentedText");
+        for(var i = 0;i < subtitles.length;i++) {
+          if(subtitles[i].lang == language_settings.subtitle_language) {
+            player.setTextTrack(subtitles[i]);
+            break;
+          }
+        }
+       }
     });
     var languages = i18n.getSupportedLanguages();
     var select = document.getElementById("ui_language");
@@ -167,6 +199,8 @@ function showEpg() {
     $(".player-ui").addClass("hide");
     $(".epg").show();
     $(".grid").show();
+    $(".epgchannels").remove();
+    epg.open = true;
     $(".grid").append(epg.showChannel(selectedChannel));
     var epgdate = new Date(epg.start*1000);
     $("#epg_date").text(epgdate.getDate()+"."+(epgdate.getMonth()+1)+".");
@@ -176,10 +210,12 @@ function showEpg() {
     else if(epg.displayIndex >= (epg.channels.length-3)) {
         $("#next_channel").addClass("end");
     }
+
 }
 
 function closeEpg() {
     $(".epg").hide();
+    epg.open = false;
     if(! $(".epg").hasClass("hide") ) {
         $(".epg").addClass("hide");
     }
@@ -192,10 +228,17 @@ function closeEpg() {
 
 function closeProgramInfo() {
     $(".programinfo").addClass("hide");
-    $(".grid").show();
+    if(epg.open) {
+      $(".grid").show();
+    }
+    else {
+      closeEpg();
+    }
 }
 
 function openProgramInfo(program) {
+    $(".epg").removeClass("hide");
+    $(".epg").show();
     program.populateProgramInfo();
     $(".grid").hide();
     $(".programinfo").removeClass("hide");
@@ -580,14 +623,17 @@ function selectAudio(track) {
 }
 
 function updateLanguage() {
-    var subtitleLanguage = document.getElementById("subtitle_language").value;
-    var audioLanguage = document.getElementById("audio_language").value;
-    var uiLanguage = document.getElementById("ui_language").value;
-    var accessibleAudio = document.getElementById("accessible_audio").checked;
-    if(uiLanguage != i18n.getCurrentLanguage()) {
-       i18n.loadLanguage(uiLanguage, updateUILanguage);
+    language_settings.subtitle_language = document.getElementById("subtitle_language").value;
+    language_settings.audio_language = document.getElementById("audio_language").value;
+    language_settings.ui_language = document.getElementById("ui_language").value;
+    language_settings.accessible_audio = document.getElementById("accessible_audio").checked;
+    if(language_settings.ui_language != i18n.getCurrentLanguage()) {
+       i18n.loadLanguage(language_settings.ui_language, updateUILanguage);
     }
-    setLocalStorage("language_settings", { "subtitle_language":subtitleLanguage,"audio_language":audioLanguage,"ui_language":uiLanguage,"accessible_audio":accessibleAudio});
+    for(var i = 0;i < channels.length;i++) {
+        channels[i].languageChanged();
+    }
+    setLocalStorage("language_settings",language_settings);
 }
 
 function updateUILanguage() {
@@ -691,4 +737,14 @@ function isDRMSystemSupported(drmSystemId) {
     }
   }
   return false;
+}
+
+function togglePause() {
+  if(player.isPaused()) {
+    player.play();
+  }
+  else {
+    player.pause();
+    $("#pause a").text("Play");
+  }
 }

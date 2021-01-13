@@ -17,6 +17,8 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     var services = getChildElements(doc.documentElement,"Service");
     var contentGuides = getChildElements(doc.documentElement,"ContentGuideSource");
     var contentGuideURI = null;
+    var moreEpisodesURI = null;
+    var programInfoURI = null;
     var channelmap = [];
     if(dvbChannels) {
       for(var i = 0;i<dvbChannels.length;i++) {
@@ -27,6 +29,14 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     }
     if(contentGuides.length > 0) {
         contentGuideURI = contentGuides[0].getElementsByTagName("ScheduleInfoEndpoint")[0].getElementsByTagName("URI")[0].childNodes[0].nodeValue;
+        var moreEpisodes =  contentGuides[0].getElementsByTagName("MoreEpisodesEndpoint");
+        if(moreEpisodes.length > 0) {
+          moreEpisodesURI = moreEpisodes[0].getElementsByTagName("URI")[0].childNodes[0].nodeValue;
+        }
+        var programInfo =  contentGuides[0].getElementsByTagName("ProgramInfoEndpoint");
+        if(programInfo.length > 0) {
+          programInfoURI = programInfo[0].getElementsByTagName("URI")[0].childNodes[0].nodeValue;
+        }
     }
     var relatedMaterial = getChildElements(doc.documentElement,"RelatedMaterial");
     for(var j = 0;j < relatedMaterial.length;j++) {
@@ -86,12 +96,23 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     for (var i = 0; i < services.length ;i++) {
         var chan = {};
         chan.contentGuideURI = contentGuideURI;
+        chan.moreEpisodesURI = moreEpisodesURI;
+        chan.programInfoURI = programInfoURI;
         chan.code = i;
-        chan.title = services[i].getElementsByTagName("ServiceName")[0].childNodes[0].nodeValue;
+        var serviceNames = services[i].getElementsByTagName("ServiceName");
+        chan.titles = [];
+        for(var j = 0;j < serviceNames.length;j++) {
+          chan.titles.push(getText(serviceNames[j]));
+        }
+        chan.title = serviceNames[0].childNodes[0].nodeValue;
         chan.id = services[i].getElementsByTagName("UniqueIdentifier")[0].childNodes[0].nodeValue;
         var providers = services[i].getElementsByTagName("ProviderName");
         if(providers.length > 0) {
           chan.provider = providers[0].childNodes[0].nodeValue;
+          chan.providers = [];
+          for(var j = 0;j < providers.length;j++) {
+            chan.providers.push(getText(providers[j]));
+          }
         }
         var targetRegions = services[i].getElementsByTagName("TargetRegion");
         if(targetRegions.length > 0) {
@@ -111,6 +132,9 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
             var howRelated = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"HowRelated")[0].getAttribute("href");
             if(howRelated == howRelatedHref+"1001.2") {
                 chan.image = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
+            }
+            if(howRelated == howRelatedHref+"1000.1") {
+                chan.out_of_service_image = relatedMaterial[j].getElementsByTagNameNS(howRelatedNamespace,"MediaLocator")[0].getElementsByTagNameNS("urn:tva:metadata:2019","MediaUri")[0].childNodes[0].nodeValue;
             }
             else if(howRelated == "urn:dvb:metadata:cs:LinkedApplicationCS:2019:1.1") {
                 var app = {};
@@ -137,12 +161,16 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
         for(var j = 0;j < serviceInstances.length;j++) {
             var priority = serviceInstances[j].getAttribute("priority");
             var instance = {};
+            var displayNames = serviceInstances[j].getElementsByTagName("DisplayName");
+            instance.titles = [];
+            for(var k = 0;k < displayNames.length;k++) {
+              instance.titles.push(getText(displayNames[k]));
+            }
             instance.priority = priority;
             instance.contentProtection = [];
             instance.parallelApps = [];
             instance.mediaPresentationApps = [];
             var contentProtectionElements =  getChildElements(serviceInstances[j],"ContentProtection");
-            var drmSupported = true;
             for(var k = 0;k < contentProtectionElements.length;k++) {
               for(var l = 0;l < contentProtectionElements[k].childNodes.length;l++) {
                 if(contentProtectionElements[k].childNodes[l].nodeName == "DRMSystemId") {
@@ -150,6 +178,7 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
                   var drm = {};
                   drm.encryptionScheme = drmSystem.getAttribute("encryptionScheme");
                   drm.drmSystemId = drmSystem.getElementsByTagName("DRMSystemId")[0].childNodes[0].nodeValue;
+                  drm.cpsIndex = drmSystem.getAttribute("cpsIndex");
                   instance.contentProtection.push(drm);
                 }
               }
@@ -251,9 +280,6 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
                 instances.push(instance);
             }
         }
-        if(instances.length == 0 && chan.mediaPresentationApps.length == 0) {
-            continue;
-        }
         for(var j = 0;j < lcnList.length;j++) {
             if(lcnList[j].getAttribute("serviceRef") == chan.id) {
                 chan.lcn = parseInt(lcnList[j].getAttribute("channelNumber"));
@@ -276,6 +302,17 @@ function parseServiceList(data,dvbChannels,supportedDrmSystems) {
     return serviceList;
 }
 
+function getText(element) {
+  var text = {};
+  var lang = element.getAttributeNS("http://www.w3.org/XML/1998/namespace","lang");
+  if(!lang) {
+    lang = "default";
+  }
+  text.lang = lang;
+  text.text =  element.childNodes[0].nodeValue;
+  return text;
+}
+
 function parseRegion(regionElement) {
   var region = {};
   region.countryCodes = regionElement.getAttribute("countryCodes");
@@ -287,10 +324,7 @@ function parseRegion(regionElement) {
   else if(names.length > 1) {
     region.regionNames = [];
     for(var j = 0;j < names.length;j++) {
-      var name = {};
-      name.name =  names[j].childNodes[0].nodeValue;
-      name.lang = names[j].getAttributeNS("xml","lang");
-      region.regionNames.push(name);
+      region.regionNames.push(getText(names[j]));
     }
   }
   var wildcardPostcodes = getChildElements(regionElement,"WildcardPostcode");
@@ -620,4 +654,34 @@ var dvb_i_language_list = {
   "eng": "English",
   "deu" : "Deutsch",
   "fin":"Suomi"
+}
+
+function getLocalizedText(texts,lang) {
+  if(texts.length == 1) {
+    return texts[0].text;
+  }
+  else if(texts.length > 1){
+    var defaultTitle = null;
+    for(var i = 0;i < texts.length;i++) {
+      if(texts[i].lang == lang) {
+        return texts[i].text;
+      }
+      else if(texts[i].lang == "default") {
+        defaultTitle = texts[i].text;
+      }
+    }
+    if(defaultTitle != null) {
+      return defaultTitle;
+    }
+    else {
+      return texts[0].text
+    }
+  }
+  return null;
+}
+
+var creditsTypes = {
+  "urn:tva:metadata:cs:TVARoleCS:2011:V20":"Production Company",
+  "urn:tva:metadata:cs:TVARoleCS:2011:AD6":"Presenter",
+  "urn:mpeg:mpeg7:cs:RoleCS:2001:ACTOR":"Actor"
 }

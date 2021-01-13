@@ -47,7 +47,9 @@
     var _epg_ = null;
     var channelToOpen = 0;
     var firstChannel =  "";
-    
+    var languages = null;
+    var supportedDrmSystems = ["9a04f079-9840-4286-ab92-e65be0885f95"];
+
 
 
     if(channelList){
@@ -104,6 +106,11 @@
     }
 
     function loadChannelList(){
+        languages = getLocalStorage("languages");
+        if(!languages) {
+          languages = {};
+          languages.ui_language = "eng";
+        }
         var serviceList = getLocalStorage("servicelist");
       
         $.get( serviceList, function( data ) {
@@ -113,7 +120,7 @@
               var config = vid.getChannelConfig();
               dvbChannels = config.channelList;
             } catch (e) {}
-            var list = parseServiceList(data,dvbChannels);
+            var list = parseServiceList(data,dvbChannels,supportedDrmSystems);
             if(list.image) {
               $("#list_logo").attr("src",list.image);
             }
@@ -285,6 +292,7 @@
                                 </span><span id="detail_audio"></span>
                             </div>
                             <div id="detail_year"></div>
+                            <div id="available"></div>
                             <div id="rating"></div>
                         </div>
                         <div id="detail_programimage_container">                        

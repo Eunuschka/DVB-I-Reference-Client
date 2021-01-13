@@ -8,6 +8,7 @@ function EPG(channels){
     date.setHours(0,0,0,0);
     this.start = Math.round(date.getTime() / 1000);
     this.end = this.start+24*60*60;
+    this.open = false;
 }
 
 EPG.prototype.populate = function (start,end) {
@@ -15,13 +16,13 @@ EPG.prototype.populate = function (start,end) {
     var count = self.channels.length;
     if(self.element == null){
 		self.element = document.createElement("div");
-        self.element.addClass("row");
+        self.element.addClass("row epgchannels");
     }
     else {
         $(self.element).empty();
     }
     var serviceIndex = self.displayIndex;
-    for(var i = serviceIndex ;i<(serviceIndex+3);i++) {
+    for(var i = serviceIndex;i<(serviceIndex+3) && i < self.channels.length;i++) {
         self.element.appendChild(self.channels[i].showEPG(start,end));
     }
 
@@ -39,6 +40,9 @@ EPG.prototype.showChannel = function(service,start,end) {
         }
     }
     this.displayIndex = Math.min(serviceIndex,(this.channels.length-3));
+    if(this.displayIndex < 0) {
+        this.displayIndex = 0;
+    }
     return this.populate(start,end);
 }
 

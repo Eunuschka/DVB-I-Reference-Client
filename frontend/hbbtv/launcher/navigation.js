@@ -157,23 +157,32 @@ function registerKeys() {
 }
 
 function onChannelChangeSucceeded(channel) {
-    console.log("onChannelChangeSucceeded:"+channel.name);
     if(languages.subtitleLanguage ) {
       var subtitles = getDVBTracks(broadcast.COMPONENT_TYPE_SUBTITLE);
       for(var i = 0;i < subtitles.length;i++) { 
           if(subtitles[i].lang == languages.subtitleLanguage) {
-            selectDVBTrack(checked, supervisor.COMPONENT_TYPE_SUBTITLE);
+            selectDVBTrack(i, supervisor.COMPONENT_TYPE_SUBTITLE);
             break;
           }
       }
     }
     if(languages.audioLanguage ) {
        var audioTracks = getDVBTracks(broadcast.COMPONENT_TYPE_AUDIO);
-       for(var i = 0;i < audioTracks.length;i++) { 
-          if(audioTracks[i].lang == languages.audioLanguage) {
-            selectDVBTrack(checked, supervisor.COMPONENT_TYPE_AUDIO);
+       var selectedIndex = -1;
+       for(var i = 0;i < audioTracks.length;i++) {
+        if(audioTracks[i].lang == languages.audioLanguage) {
+          if(languages.accessibleAudio && audioTracks[i].type == "visual impaired") {
+            selectDVBTrack(i, broadcast.COMPONENT_TYPE_AUDIO);
+            selectedIndex = -1;
             break;
           }
+          else if(selecteIndex == -1) {
+            selectedIndex = i;
+          }
+        }
+      }
+      if(selectedIndex >= 0) {
+       selectDVBTrack(selectedIndex, broadcast.COMPONENT_TYPE_AUDIO);
       }
     }
 }
@@ -405,11 +414,26 @@ function onKey(keyCode)
 		break;
     case VK_YELLOW:
     case KeyEvent.VK_SUBTITLE:
+            hideInfobanner();
             showSettings();
             break;
 		case VK_PAUSE:
+      if(player) {
+        if( player.isPlaying() ){
+	        player.pause();
+        }
+        else{
+	        player.play();
+        }
+      }
+      break;
 		case VK_PLAY:
-            
+      if(player) {
+        if(! player.isPlaying() ) {
+          player.play();
+        }
+      }
+      break;
 		case VK_STOP:
 			return false;
 		break;
@@ -534,9 +558,16 @@ function getDVBTracks(type) {
   var broadcastElement = supervisor ? supervisor : broadcast;
 
   tracks = broadcastElement.getComponents(type);
-  var trackList = [];  
+  var activeTracks = broadcastElement.getCurrentActiveComponents(type);
+  var trackList = [];
   for(var i = 0;i<tracks.length;i++) {
     var track = {};
+    for(var j = 0;j < activeTracks.length;j++) {
+      if(activeTracks[j].pid == tracks[i].pid) {
+        track.current = true;
+        break;
+      }
+    }
     track.lang = tracks[i].language;
     if(tracks[i].audioDescription) {
       track.type = "visual impaired";
@@ -664,16 +695,29 @@ function updateBannerProgram(prefix,program) {
               }
             }
           }
-          $("#"+prefix+'title').html(program.title+parental);
+          $("#"+prefix+'title').html(program.getTitle()+parental);
           $("#"+prefix+'starttime').html(program.start ? program.start.create24HourTimeString()+" -" : "");
           $("#"+prefix+'endtime').html(program.end ? program.end.create24HourTimeString() : "");
-          $("#"+prefix+'image_img').attr("src",program.mediaimage);
+          $("#"+prefix+'image_img').attr("src",program.mediaimage ? program.mediaimage : "" );
+          if(program.cpsIndex) {
+            var cpsInstance = program.getChannel().getServiceInstanceByCPSIndex(program.cpsIndex);
+            if(cpsInstance) {
+                $("#"+prefix+'protected_img').attr("src",'../CommonUI/lock_green.png');
+            }
+            else {
+                $("#"+prefix+'protected_img').attr("src",'../CommonUI/lock_red.png');
+            }
+          }
+          else {
+            $("#"+prefix+'protected_img').attr("src","");
+          }
     }
     else {
         $("#"+prefix+'title').html("No program");
         $("#"+prefix+'starttime').html("");
         $("#"+prefix+'endtime').html("");
         $("#"+prefix+'image_img').attr("src","");
+        $("#"+prefix+'protected_img').attr("src","");
     }
 }
 
@@ -688,21 +732,62 @@ function updateBannerProgramDVB(prefix,program) {
     }
 }
 
+function updateCurrentInfo(program) {
+  program.getChannel().getProgramInfo(program.programId, function(info) {
+    var data = "<h3>Now showing:"+program.getTitle()+"</h3>";
+    var desc = program.getDescription();
+    if(info) {
+      var longDesc = info.getLongDescription();
+      if(longDesc) {
+        desc = longDesc;
+      }
+      if(info.creditsItems) {
+           desc += "<br/>";
+           for(var i = 0;i< info.creditsItems.length;i++) {
+              var role = creditsTypes[info.creditsItems[i].role];
+              if(role) {
+                  desc += (role+": ");
+              }
+              if(info.creditsItems[i].organizations && info.creditsItems[i].organizations.length > 0) {
+                  desc += info.creditsItems[i].organizations.join(",");
+              }
+              if(info.creditsItems[i].person) {
+                 desc += info.creditsItems[i].person.givenName + " " +info.creditsItems[i].person.familyName;
+              }
+              if(info.creditsItems[i].character) {
+                 desc += "("+info.creditsItems[i].character.givenName + " " +info.creditsItems[i].character.familyName+")";
+              }
+              desc += "<br/>";
+             }
+          }
+          if(info.keywords) {
+             desc += "Keywords:";
+             for(var i = 0;i< info.creditsItems.length;i++) {
+               desc += (info.keywords[i].value+",");
+             }
+             desc = desc.substring(0,desc.length-1);
+          }
+     }
+     data += desc;
+     $("#now_info").html(data);
+  });
+}
 
 function showInfobanner() {
     var channel = getCurrentChannel();
-    $('#chinfo_chname').html(channel.title);
+    $('#chinfo_chname').html( getLocalizedText(channel.titles,languages.ui_language));
     $('#chinfo_chnumber').html(channel.lcn);
     $('#chinfo_chicon_img').attr("src",channel.image ? channel.image : "" );
     var serviceInstance = channel.getServiceInstance();
     if(channel.epg) {
-     updateBannerProgram("chinfo_now_",channel.epg.now);       
+     updateBannerProgram("chinfo_now_",channel.epg.now);
+     updateCurrentInfo(channel.epg.now);
      if (channel.epg.now && channel.epg.now.start && channel.epg.now.prglen) { 
         var now = new Date();
         var elapsed = (now.getTime() -channel.epg.now.start.getTime())/10;
         $("#chinfo_progressbarTime").css("width",elapsed/(channel.epg.now.prglen*60)+"%");
       }
-      updateBannerProgram("chinfo_next_",channel.epg.next); 
+      updateBannerProgram("chinfo_next_",channel.epg.next);
     }
     else if(supervisor && serviceInstance && supervisor.currentChannel && serviceInstance.dvbChannel && supervisor.currentChannel.ccid == serviceInstance.dvbChannel.ccid){
         var programs = supervisor.programmes;
@@ -794,7 +879,7 @@ function channelUp(){
 			currentChIndex = channel_obj.lcn;
           
 			document.getElementById("info_num").innerHTML = channel_obj.lcn+".";
-            document.getElementById("info_name").innerHTML = channel_obj.title.replace('&', '&amp;');
+            document.getElementById("info_name").innerHTML =  getLocalizedText(channel_obj.titles,languages.ui_language).replace('&', '&amp;');
             if(!menuOpen) {
                 showInfobanner();
             }
@@ -826,7 +911,7 @@ function channelDown(){
 			}
             currentChIndex = channel_obj.lcn;
             document.getElementById("info_num").innerHTML = channel_obj.lcn+".";
-            document.getElementById("info_name").innerHTML = channel_obj.title.replace('&', '&amp;');
+            document.getElementById("info_name").innerHTML = getLocalizedText(channel_obj.titles,languages.ui_language).replace('&', '&amp;');
             if(!menuOpen) {
                 showInfobanner();
             }
@@ -839,6 +924,8 @@ function channelDown(){
 }
 
 function selectService(channel_obj) {
+     hideInfo();
+     $("#info").addClass("hide");
      selectService.selected = false;
      selectedService = channel_obj;
      selectedService.selected = true;
@@ -894,7 +981,6 @@ function selectService(channel_obj) {
 }
 
 function checkAvailability() {
-   console.log("checkAvailability",new Date());
    var instance = selectedService.getServiceInstance();
    if(instance != serviceInstance) {
        console.log("different service instace, select service");
@@ -921,14 +1007,19 @@ function doServiceSelection() {
             player = null;
         }
         else {
-              try {
-              broadcast = document.getElementById('broadcast');
-              broadcast.stop();
-              broadcast.addClass("hide_broadcast");
-              }
-              catch(e) {}
+          try {
+          broadcast = document.getElementById('broadcast');
+          broadcast.stop();
+          broadcast.addClass("hide_broadcast");
           }
-        showInfo("Service not available");
+          catch(e) {}
+        }
+        if(selectedService.out_of_service_image) {
+          showInfo("<img src=\""+selectedService.out_of_service_image+"\"/>",60,"noservice");
+        }
+        else {
+          showInfo("Service not available",60,"noservice");
+        }
         return;
       }
       if(serviceInstance.mediaPresentationApps) {
@@ -1071,11 +1162,37 @@ function playDASH(url) {
                 'liveCatchUpPlaybackRate': catchupRate
             }
         });
+        player.player.on('error', function(e) {
+          console.log(e);
+          message = "Error playing stream!";
+          if(e.error && e.error.message) {
+              message += "<br/>"+e.error.message;
+          }
+          showInfo(message);
+        });
      }
      else { //html5 as default
         player = new VideoPlayerHTML5("videodiv");
         player.populate();
         player.createPlayer();
+        var errorFunction = function(e){
+          console.log("Error",e);
+          message = "Error playing stream!";
+          if(player && player.video && player.video.error) {
+              if(player.video.error.message) {
+                  message += "<br/>"+player.video.error.code;
+              }
+              message += "<br/>Error code:"+player.video.error.code;
+          }
+          else {
+            console.log(player);
+          }
+          showInfo(message);
+          if(player && player.video) {
+            player.video.removeEventListener("error",errorFunction);
+          }
+        };
+        player.video.addEventListener('error', errorFunction);
      }
      player.setURL(url);
        player.startVideo(true);
@@ -1128,7 +1245,7 @@ function keyEnter(){
 			
 			if(activeBox instanceof Box){
                 document.getElementById("info_num").innerHTML = channel_obj.lcn+".";
-                document.getElementById("info_name").innerHTML = channel_obj.title.replace('&', '&amp;');
+                document.getElementById("info_name").innerHTML =  getLocalizedText(channel_obj.titles,languages.ui_language).replace('&', '&amp;');
                 currentChIndex = channel_obj.lcn;
                 selectService(channel_obj);
 			}

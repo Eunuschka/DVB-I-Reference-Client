@@ -169,7 +169,7 @@ div, span {
 	height:7px;
 	/*width:220px;*/
 	width: 233px;
-	background-color: #353535;
+  background-color: rgba(0,0,0,0.2);
 	top:50px;
 	left:0px;
 	display: inherit;
@@ -322,6 +322,14 @@ div, span {
   background-image: url("../CommonUI/bg_channel_info.png");
   background-repeat: no-repeat;
 }
+#channel_info #info_num {
+	margin-left: 70px;
+	color: #0098f4;
+	top: 250px;
+	position: relative;
+	height: 40px;
+	display: inline-block;
+}
 .channel_info .menuitem_title span.menuitem_chname {
   _background-color: #222;
     _border-radius: 50%;
@@ -342,15 +350,17 @@ div, span {
   margin-left: 70px;
   margin-top: 250px;
 }
-.channel_info span:last-child {
-  margin-top: 250px;
-  color: #fff;
+.channel_info #info_name {
 	z-index: 9;
 	text-align:left;
   font-size: 28px;
   height: 40px;
   display: inline-block;
-  
+ 	margin-left: 15px;
+	color: #0098f4;
+	top: 250px;
+	position: relative;
+	
 }	
 .channel_info.hide {
   display: block !important;
@@ -740,4 +750,16 @@ div, span {
   left: 250px;
   z-index:300;
   background-color: #0008
+}
+
+.lock img {
+  height: 20px;
+  width: 20px;
+}
+
+#now_info {
+  left: 500px;
+  width: 600px;
+  margin: 20px;
+  background-color: #000C;
 }

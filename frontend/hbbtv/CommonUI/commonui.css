@@ -285,7 +285,7 @@ img#logo {
 	_box-shadow: 0px 0px 15px #000;
 	padding-left: 80px;
 	_border-top: 2px solid #101011;
-	background-color: #010101;
+	_background-color: #010101;
 }
 #buttonbar0, #buttonbar_miniepg {
 	background-color: transparent !important;
@@ -700,16 +700,37 @@ img#logo {
 	top:300px;
 	background: #fff !important;
 	border-radius:5px;
-	border: 1px solid transparent;
-	left:400px;
-	width:480px;
+	border: 2px solid #333;
+	left:289px;
+	width:700px;
 	padding:5px;
 	text-align:center;
 	color:#000 !important;
 	z-index:10001;
 	opacity : 1.0;
 }
-
+#info.noservice {
+	top: 160px;
+	max-height: 400px;
+	width: 800px;
+	left: 238px;
+	background: transparent !important;
+	/* for preview purposes */
+	background: rgba(0,0,0,0.5) !important;
+	border: 2px solid transparent;
+  color: #fff !important;
+  font-size: 36px;
+  top: 50%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	 transform: translateY(-50%);
+  padding: 0px;
+}
+#info.noservice img {
+	object-fit: contain;
+	width: 100%;
+	height: 100%;
+}
 #info.hide{
 	opacity: 0.0 !important;
 }
@@ -776,7 +797,7 @@ img#logo {
 .boxitem:last-child{
 	margin-right: 90px;
 }
-
+/*
 .boxitem.focused .boxitem_image:after {
 	background: url("../CommonUI/bg_boxitem_image.png");
 	content: "";
@@ -786,7 +807,7 @@ img#logo {
   	height:10px;
   	bottom: 0px;
 }
-/**/
+
 .box-item:last-child {
 	border: 2px solid red !important;
 	padding-right: 50px;
@@ -801,9 +822,10 @@ img#logo {
   	height:10px;
   	bottom: 0px;
 }
+*/
 .boxitem img {
-  max-height: 131px;
-  max-width: 233px;
+  height: 131px;
+  width: 233px;
   text-align: center;
   vertical-align: middle;
   margin-left: auto;
@@ -812,6 +834,7 @@ img#logo {
 	-webkit-transition: all 0.2s linear;
 	-o-transition: all 0.2s linear;
 	transition: all 0.2s linear; 
+  object-fit: cover;
 }
 .boxitem_image {
 	background-color: #000;	
@@ -825,6 +848,7 @@ img#logo {
 	background-size:cover;
   border: 2px solid #000;
   border-radius: 2px;
+  overflow: hidden;
 }
 .boxitem_image img:before {
   color: #8C8C8C !important;
@@ -922,14 +946,17 @@ img#logo {
 .boxitem.viewtvguide.focused .boxitem_info {
 	display: none !important;	
 }
+.boxitem_info span.horizontalAutoscroll {
+  display: block;
+	margin-bottom: 2px;	  
+}
 .boxitem_info span {
 	font-size: 16px;
-	line-height: 18px;
 	color: white;
-	display:block;
-	_margin-top: 0px !important;	
+	display:inline-block;
+  line-height: 14px;
+  margin-bottom: 4px;
 }
-
 .boxitem_info span span:not(.timeremaining){
 	display:block;
 	width: 210px;
@@ -940,22 +967,22 @@ img#logo {
 }
 .boxitem_info span:first-child{
 	margin-top: 0px;
-    height: 20px;
+  height: 20px;
 }
-.boxitem_info span.horizontalAutoscroll {
-	margin-bottom: 4px;	
+.boxitem_info span.lock{
+  margin-left: 5px;
 }
 .timeremaining {
 	color: #808080 !important;
 	font-size: 14px !important;	
-	height: 15px;
+	height: 20px;
 	line-height: 14px !important;
 	margin-bottom: 4px;
 }
 .duration {
 	color: #808080 !important;
 	font-size: 14px !important;	
-	height: 15px;
+	height: 20px;
 	line-height: 14px !important;
 	margin-bottom: 4px;
 }
