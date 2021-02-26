@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/slepr-master.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/slepr-master.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/rtp-player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/rtp-player.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +25,7 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="JavaScript Debug.player.html">
+  <component name="RunManager" selected="JavaScript Debug.rtp-player.html">
     <configuration name="index.html (1)" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/backend/index.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -35,11 +35,15 @@
     <configuration name="player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/frontend/android/player.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
+    <configuration name="rtp-player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/frontend/android/rtp-player.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
     <configuration name="video_player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/video_player/video_player.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JavaScript Debug.rtp-player.html" />
         <item itemvalue="JavaScript Debug.player.html" />
         <item itemvalue="JavaScript Debug.video_player.html" />
         <item itemvalue="JavaScript Debug.index.html (1)" />
@@ -67,6 +71,7 @@
       <workItem from="1606812242781" duration="48000" />
       <workItem from="1606812370468" duration="11000" />
       <workItem from="1606814447899" duration="7188000" />
+      <workItem from="1610532254262" duration="2136000" />
     </task>
     <servers />
   </component>
