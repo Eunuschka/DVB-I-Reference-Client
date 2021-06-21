@@ -3,35 +3,38 @@
 
 // Functions
 function open5GBroadcast() {
-    // location.href = "../5g-related/html/3gpp_broadcast_player.html";
-    // location.href = "../5g-related/html/bc_player_2.html";
-    // location.href = "../5g-related/html/bc_player_2.html";
-    // location.href = "../5g-related/html/bc_player_kabisch_2.html";
-    location.href = '../5g-related/html/bc_player_kabisch_3.html';
-    return;
+    // Create a Pop-Up to ask whether HLS, DASH or LL DASH should be used
+    // Popup --> if hls
+        // location.href = "../5g-related/html/hls-local-video.html";
+    //          if dash
+            location.href = '../5g-related/html/dash-local-video.html';
+    //          if ll dash
+    //  location.href = '../5g-related/html/ldash-local-video.html';
 }
 
-function backP2PStreams() {
-    location.href = "player.html";
-    return;
+function backDashStreams() {
+    location.href = "../../android/player.html";
 }
 
 function changeService() {
-    let jQuery;
-    jQuery.ajax({
-        type: "POST",
-        url: 'change_service/change_service.php',
-        dataType: 'json',
-        data: {functionname: 'change_service.php', arguments: [1, 2]},
+    console.log('Start change service function');
 
-        success: function (obj, textstatus) {
-            if( !('error' in obj) ) {
-                yourVariable = obj.result;
-            }
-            else {
-                console.log(obj.error);
-            }
+    $.ajax({
+        url:'../../../backend/5g-related/change_service/change_service.php',
+        complete: function (response) {
+            $('#output').html(response.responseText);
+        },
+        error: function () {
+            $('#output').html('Bummer: there was an error!');
         }
     });
 
+    console.log('End change service function');
+    return false;
+
+
+
+    /*$.get('../../../backend/5g-related/change_service/change_service.php', function(data) {
+        console.log(data)
+    });*/
 }

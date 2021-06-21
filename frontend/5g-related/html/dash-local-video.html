@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="english">
+    <head>
+        <!-- DVB-I related Scripts-->
+        <script type="text/javascript" src="../../android/js/dvbi-mobile.js"></script>
+
+        <title>DASH Player</title>
+    </head>
+
+    <body>
+
+        <a href="#" onclick="return changeService();"> test </a>
+        <div id="output">waiting for action</div>
+
+
+        <h1>5G Broadcast Receptipon</h1>
+
+        <video id="videoPlayer" controls autoplay></video>
+
+        <button onclick="backDashStreams()">Back</button>
+        <button onclick="return changeService()">Change Service</button>
+
+        <script src="http://cdn.dashjs.org/latest/dash.all.min.js"></script>
+        <script>
+                (function(){
+                    let url = "http://127.0.0.1:80/stream/dash/output.mpd";
+                    let player = dashjs.MediaPlayer().create();
+                    player.initialize(document.querySelector("#videoPlayer"), url, true);
+                })();
+        </script>
+
+        <!-- My Scripts-->
+        <script type="text/javascript" src="../js/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="../js/5g-broadcast-functions.js"></script>
+    </body>
+</html>
+

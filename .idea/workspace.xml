@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="">
+    <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="tidy up directory">
+      <change afterPath="$PROJECT_DIR$/frontend/5g-related/js/jquery-3.6.0.min.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/3gpp_broadcast_player.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_kabisch_2.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_kabisch_3.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/player.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/change_service/change_service.batch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/change_service/change_service.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/5g-related/html/3gpp_broadcast_player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/5g-related/html/hls-local-video.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/5g-related/html/bc_player_2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/5g-related/html/bc_player_kabisch_2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/5g-related/html/bc_player_kabisch_3.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/5g-related/html/dash-local-video.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/5g-related/js/5g-broadcast-functions.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/5g-related/js/5g-broadcast-functions.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,6 +21,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -46,6 +48,11 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\hoyer\Documents\GitHub\DVB-I-Reference-Client\frontend\5g-related\js" />
+    </key>
   </component>
   <component name="RunManager" selected="JavaScript Debug.player.html">
     <configuration name="3gpp_broadcast_player.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/DVB-I-Reference-Client/frontend/android/3gpp_broadcast_player.html" useBuiltInWebServerPort="true">
@@ -107,11 +114,44 @@
       <workItem from="1622498174849" duration="3387000" />
       <workItem from="1622531949395" duration="20000" />
       <workItem from="1622548119024" duration="1904000" />
-      <workItem from="1624269628449" duration="2255000" />
+      <workItem from="1624269628449" duration="3984000" />
+      <workItem from="1624277084462" duration="64000" />
+      <workItem from="1624277158425" duration="7131000" />
     </task>
+    <task id="LOCAL-00001" summary="tidy up directory">
+      <created>1624272928367</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1624272928367</updated>
+    </task>
+    <task id="LOCAL-00002" summary="tidy up directory">
+      <created>1624273004804</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1624273004804</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="tidy up directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="tidy up directory" />
   </component>
 </project>
