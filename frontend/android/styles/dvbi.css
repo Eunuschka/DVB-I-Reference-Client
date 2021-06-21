@@ -43,6 +43,12 @@ body.player {
   float: left;
   margin-left: 20px; }
 
+/*#hls-video-wrapper {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}*/
+
 #video {
   width: 100%;
   max-width: 100%;

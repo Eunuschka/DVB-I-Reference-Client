@@ -171,6 +171,7 @@ window.onload = function(){
     var select = document.getElementById("ui_language");
     for (var i = 0; i < languages.length ;i++) {
         var option = document.createElement('option');
+        var option = document.createElement('option');
         option.value = languages[i].lang;
         option.appendChild(document.createTextNode(languages[i].name));
         if(i18n.getCurrentLanguage() == languages[i].lang) {
@@ -437,7 +438,16 @@ function showStreamInfo() {
 
 /******************* my function *********************/
 function open5GBroadcast() {
-    location.href = "rtp-player.html";
+    // location.href = "3gpp_broadcast_player.html";
+    // location.href = "bc_player_2.html";
+    // location.href = "bc_player_2.html";
+    // location.href = "bc_player_kabisch_2.html";
+    location.href = "bc_player_kabisch_3.html";
+    return;
+}
+
+function backP2PStreams() {
+    location.href = "player.html";
     return;
 }
 /*****************************************************/

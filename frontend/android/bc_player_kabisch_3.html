@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- CSS  -->
+        <link href="https://unpkg.com/video.js/dist/video-js.css" rel="stylesheet">
+        <script src="js/dvbi-mobile.js"></script>
+    </head>
+
+    <body>
+	<h1>5G Broadcast Receptipon</h1>
+
+    <video id="videoPlayer" controls autoplay></video>
+
+    <button onclick="backP2PStreams()">Back</button>
+	  
+	<script src="http://cdn.dashjs.org/v3.1.0/dash.all.min.js"></script>
+	<script>
+            (function(){
+                // var url = "http://127.0.0.1:8080/out.mpd";
+                var url = "http://127.0.0.1:80/stream/dash/output.mpd";
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("#videoPlayer"), url, true);
+            })();
+        </script>
+    </body>
+</html>
+
