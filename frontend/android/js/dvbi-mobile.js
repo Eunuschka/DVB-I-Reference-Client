@@ -436,22 +436,6 @@ function showStreamInfo() {
   toggleSettings();
 }
 
-/******************* my function *********************/
-function open5GBroadcast() {
-    // location.href = "3gpp_broadcast_player.html";
-    // location.href = "bc_player_2.html";
-    // location.href = "bc_player_2.html";
-    // location.href = "bc_player_kabisch_2.html";
-    location.href = "bc_player_kabisch_3.html";
-    return;
-}
-
-function backP2PStreams() {
-    location.href = "player.html";
-    return;
-}
-/*****************************************************/
-
 function updateStreamInfo() {
     if(player) {
         try {

@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="840b1846-e111-4ba5-b2af-bea9cd6cf9bd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/android/bc_player_2.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/slepr-master.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/slepr-master.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/3gpp_broadcast_player.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_kabisch_2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/android/bc_player_kabisch_3.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/js/dvbi-mobile.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/android/player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/player.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/rtp-player.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/3gpp_broadcast_player.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/android/styles/dvbi.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/android/styles/dvbi.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +26,14 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1jGsUVcndsQGP0SNKGh4ye9ZGqu" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -34,6 +43,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -97,6 +107,7 @@
       <workItem from="1622498174849" duration="3387000" />
       <workItem from="1622531949395" duration="20000" />
       <workItem from="1622548119024" duration="1904000" />
+      <workItem from="1624269628449" duration="2255000" />
     </task>
     <servers />
   </component>
