@@ -4,26 +4,34 @@
         <!-- DVB-I related Scripts-->
         <script type="text/javascript" src="../../android/js/dvbi-mobile.js"></script>
 
+        <meta name="theme-color" content="#0098f4" />
         <title>DASH Player</title>
+
+        <!-- Bootstrap -->
+        <link href="../../android/styles/bootstrap-4.3.1.css" rel="stylesheet">
+
+<!--
+        <link rel="stylesheet" type="text/css" href="../../android/styles/dvbi.css">
+-->
     </head>
 
     <body>
+        <div id="video-wrapper" style="width: 50%; margin: 0 auto;">
+<!--
+            <h1 style="color: white; text-align: center">5G Broadcast Reception</h1>
+-->
+            <h1 style="text-align: center">5G Broadcast Reception</h1>
+            <video id="videoPlayer" controls autoplay></video>
 
-        <a href="#" onclick="return changeService();"> test </a>
-        <div id="output">waiting for action</div>
+            <button onclick="backDashStreams()">Back</button>
+            <button onclick="return changeService()">Change Service</button>
+        </div>
 
-
-        <h1>5G Broadcast Receptipon</h1>
-
-        <video id="videoPlayer" controls autoplay></video>
-
-        <button onclick="backDashStreams()">Back</button>
-        <button onclick="return changeService()">Change Service</button>
 
         <script src="http://cdn.dashjs.org/latest/dash.all.min.js"></script>
         <script>
                 (function(){
-                    let url = "http://127.0.0.1:80/stream/dash/output.mpd";
+                    let url = "http://127.0.0.1:80/frontend/stream/dash/output.mpd";
                     let player = dashjs.MediaPlayer().create();
                     player.initialize(document.querySelector("#videoPlayer"), url, true);
                 })();

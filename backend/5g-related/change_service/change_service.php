@@ -1,12 +1,20 @@
 <?php
+    echo "Run change service script." . "<br>";
 
-   /*  $zahl = 4;
+    // Arguments
+    if (PHP_SAPI === 'cli') {
+        $Service_number = $argv[1];
+    }
+    else {
+        $Service_number = $_GET['service'];
+    }
 
-    function quadrat($zahl)
-    {
-        return $zahl * $zahl;
-    } */
+    $dir = getcwd();
 
-    // echo 'Das Quadrat von ' . $zahl . ' ist ' . quadrat($zahl) . '.';
-    echo 'Hello World!';
+    echo $dir . "<br>";
+
+    echo "cmd /c START ". $dir . "\change_service.bat" . " " . $Service_number . " ";
+
+    exec("cmd /c START ". $dir . "\change_service.bat" . " " . $Service_number . " ");
+    // system("cmd " . $dir . "\change_service.bat");
 ?>

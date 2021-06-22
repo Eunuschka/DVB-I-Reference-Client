@@ -1,0 +1,19 @@
+# local
+ffmpeg -re -i rtp://127.0.0.1:1234 -map 0 -map 0 -b:v:0 800k -b:v:1 300k -s:v:1 320x170 -profile:v:1 baseline -profile:v:0 main -bf 1 -keyint_min 120 -g 120 -sc_threshold 0 -b_strategy 0 -ar:a:1 22050 -use_timeline 1 -use_template 1 -window_size 5 -adaptation_sets "id=0,streams=v id=1,streams=a" -f dash C:\Users\Hoyer\Documents\GitHub\DVB-I-Reference-Client\stream\dash\output.mpd
+
+# demo
+ffmpeg -re -i rtp://232.1.1.111.40001 -c
+
+https://blog.zazu.berlin/internet-programmierung/mpeg-dash-and-hls-adaptive-bitrate-streaming-with-ffmpeg.html
+
+#################### Playout RTP #######################
+ffmpeg -re -stream_loop -1 -i movie.mp4 -c copy -f rtp_mpegts rtp://232.1.1.120:40020/video.mp4?pkt_size=1316
+ffmpeg -re -stream_loop -1 -i movie.mp4 -c:v libx264 -vf "drawtext=text='%{pts\:hms}': x=(w-tw)/2: y=h-(2*lh):fontfile=C\:/Windows/Fonts/courbd.ttf:fontsize=36:fontcolor=white: box=1: boxcolor=0x00000000@1" -f rtp_mpegts rtp://232.1.1.120:40020/video.mp4?pkt_size=1316
+ffmpeg -re -stream_loop -1 -i movie.mp4 -c:v libx264 -vf "drawtext=text='%{pts\:hms}': x=(w-text_w)/2: y=h-(2*line_h): fontsize=36: fontcolor=white: box=1: boxcolor=0x00000000@1" -f rtp_mpegts rtp://232.1.1.120:40020/video.mp4?pkt_size=1316
+
+
+#################### DASH ####################
+
+
+# local IfN Arbeitsrechner
+ffmpeg -i rtp://127.0.0.1:1234 -map 0 -map 0 -b:v:0 800k -b:v:1 300k -s:v:1 320x170 -profile:v:1 baseline -profile:v:0 main -bf 1 -keyint_min 120 -g 120 -sc_threshold 0 -b_strategy 0 -ar:a:1 22050 -use_timeline 1 -use_template 1 -window_size 5 -adaptation_sets "id=0,streams=v id=1,streams=a" -f dash C:\Users\hoyer\Documents\GitHub\DVB-I-Reference-Client\frontend\stream\dash\output.mpd

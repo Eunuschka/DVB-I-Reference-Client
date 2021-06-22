@@ -19,13 +19,20 @@ function backDashStreams() {
 function changeService() {
     console.log('Start change service function');
 
-    $.ajax({
-        url:'../../../backend/5g-related/change_service/change_service.php',
-        complete: function (response) {
-            $('#output').html(response.responseText);
+    jQuery.ajax({
+        type: "GET",
+        contentType: "application/json",
+        /*url:'http://localho.st/backend/5g-related/change_service/change_service.php',*/
+        url:'http://localhost/backend/5g-related/change_service/change_service.php',
+        data: {service: '1'},
+
+        success: function (response) {
+            alert(response);
+            alert(response.data);
+            alert('success');
         },
         error: function () {
-            $('#output').html('Bummer: there was an error!');
+            alert('failure');
         }
     });
 
